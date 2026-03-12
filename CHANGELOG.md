@@ -2,6 +2,14 @@
 
 Todas as mudanças notáveis no projeto **Pessegram** serão documentadas neste arquivo.
 
+## [2.2.6] - 2026-03-12
+
+### Adicionado
+- **Lei do Silêncio para Links**: O Gemini não é mais acionado em nenhuma mensagem que contenha URL, garantindo privacidade e economia de tokens.
+- **Detecção de Link Universal**: URLs são detectadas em qualquer posição da mensagem, ignorando metadados automáticos de encaminhamento.
+- **Estabilização de Encoding**: Correção definitiva do erro `incompatible character encodings: UTF-8 and BINARY` na comunicação com Gemini e GoiabookLM.
+- **Tratamento de Erro Inteligente**: Mensagens de erro da GoiabookLM agora são parseadas e exibidas de forma amigável e sem redundância.
+
 ## [2.1.0] - 2026-03-12
 
 ### Adicionado

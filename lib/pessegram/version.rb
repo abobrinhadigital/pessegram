@@ -1,3 +1,3 @@
 module Pessegram
-  VERSION = '1.0.0'
+  VERSION = "2.2.6"
 end

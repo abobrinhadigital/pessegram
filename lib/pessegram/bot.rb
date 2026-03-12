@@ -55,21 +55,10 @@ module Pessegram
       when '/start'
         @memory.clear
         bot.api.send_message(chat_id: message.chat.id, text: "Saudações, meu mestre. O Pessegram está ativo. Memória limpa. O que falhou hoje?")
-      when %r{\Ahttps?://\S+\z}
-        # Link puro: salva com confirmação e não chama o Gemini
-        save_link(bot, message, message.text, silent: false)
       when %r{https?://\S+}
-        # Link com texto: salva silenciosamente e comenta o resto
         url = Regexp.last_match(0)
-        save_link(bot, message, url, silent: true)
-        
-        history = @memory.get_history
-        response = @gemini.generate_response(message.text, history: history)
-        
-        @memory.add('user', message.text)
-        @memory.add('model', response)
-        
-        bot.api.send_message(chat_id: message.chat.id, text: response)
+        # Se tem link, salva na Goiaba e ponto final. O Gemini não deve ser perturbado.
+        save_link(bot, message, url, silent: false)
       else
         history = @memory.get_history
         response = @gemini.generate_response(message.text, history: history)
