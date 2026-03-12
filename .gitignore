@@ -1,0 +1,19 @@
+*.gem
+*.rbc
+/cls
+/rdoc/
+/.bundle/
+/vendor/bundle
+/lib/bundler/man/
+
+# Segurança e segredos
+.env
+.env.*
+!.env.example
+config/database.yml
+
+# Dados dinâmicos e persona
+data/*
+!data/.gitkeep
+assets/*
+!assets/.gitkeep
