@@ -21,6 +21,8 @@ module Pessegram
       request.body = { mensagem: url }.to_json
 
       response = Net::HTTP.start(@url.host, @url.port, use_ssl: @url.scheme == 'https') do |http|
+        http.open_timeout = 5 # 5 segundos para conectar
+        http.read_timeout = 5 # 5 segundos para ler a resposta
         http.request(request)
       end
 

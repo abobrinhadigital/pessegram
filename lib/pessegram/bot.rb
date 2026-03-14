@@ -66,10 +66,11 @@ module Pessegram
         
         # Se for um link em uma RESPOSTA a uma mensagem do bot que contém "MU:", manda pro Mangofier
         if message.reply_to_message && message.reply_to_message.from.is_bot && message.reply_to_message.text&.include?("MU:")
-          forward_to_mangofier(bot, message, url)
+          # Usa Thread para não travar o bot se o Mangofier estiver lento/morto
+          Thread.new { forward_to_mangofier(bot, message, url) }
         else
-          # Se não for resposta, salva na Goiaba e ponto final. O Gemini não deve ser perturbado.
-          save_link(bot, message, url, silent: false)
+          # Salva na Goiaba em background para ser resiliente
+          Thread.new { save_link(bot, message, url, silent: false) }
         end
       else
         history = @memory.get_history
@@ -85,11 +86,12 @@ module Pessegram
     def save_link(bot, message, url, silent: false)
       return bot.api.send_message(chat_id: message.chat.id, text: "GoiabookLM não configurado, mestre.") unless @goiabook
 
+      # Adicionando timeout interno na chamada da Goiaba se necessário, mas a Thread já ajuda
       @goiabook.post_bookmark(url)
       bot.api.send_message(chat_id: message.chat.id, text: "Link enviado para o GoiabookLM com sucesso!") unless silent
-    rescue GoiabookClient::Error => e
-      bot.api.send_message(chat_id: message.chat.id, text: e.message) unless silent
-      puts "#{e.message}"
+    rescue StandardError => e
+      bot.api.send_message(chat_id: message.chat.id, text: "Erro ao salvar na Goiaba: #{e.message}") unless silent
+      puts "ERRO GOIABA: #{e.message}"
     end
 
     def forward_to_mangofier(bot, message, url)
