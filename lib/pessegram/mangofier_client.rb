@@ -13,12 +13,16 @@ module Pessegram
       @token = token
     end
 
-    def post_link(url)
+    def post_link(url, context: nil)
       request = Net::HTTP::Post.new(@url.path, {
         'Content-Type' => 'application/json',
         'Authorization' => "Bearer #{@token}"
       })
-      request.body = { mensagem: url }.to_json
+      
+      payload = { mensagem: url }
+      payload[:contexto] = context if context
+      
+      request.body = payload.to_json
 
       response = Net::HTTP.start(@url.host, @url.port, use_ssl: @url.scheme == 'https') do |http|
         http.open_timeout = 5 # 5 segundos para conectar
@@ -27,10 +31,12 @@ module Pessegram
       end
 
       unless response.is_a?(Net::HTTPSuccess)
-        raise Error, "Erro no Mangofier: #{response.code} - #{response.body}"
+        # Forçamos UTF-8 para evitar o erro de BINARY/ASCII-8BIT
+        error_body = response.body.to_s.force_encoding('UTF-8')
+        raise Error, "Erro no Mangofier: #{response.code} - #{error_body}"
       end
     rescue StandardError => e
-      raise Error, "Falha na comunicação com Mangofier: #{e.message}"
+      raise Error, "Falha na comunicação com Mangofier: #{e.message.to_s.force_encoding('UTF-8')}"
     end
   end
 end
