@@ -9,6 +9,7 @@ require_relative 'pessegram/goiabook_client'
 require_relative 'pessegram/bot'
 require_relative 'pessegram/memory'
 require_relative 'pessegram/cli'
+require_relative 'pessegram/api_listener'
 
 module Pessegram
   class Error < StandardError; end

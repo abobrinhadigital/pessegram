@@ -2,6 +2,13 @@
 
 Todas as mudanças notáveis no projeto **Pessegram** serão documentadas neste arquivo.
 
+## [3.0.0] - 2026-03-14
+
+### Adicionado
+- **ApiListener (O Ouvido Digital)**: Implementação de um servidor WEBrick interno que permite ao Pessegram receber mensagens via POST de sistemas externos.
+- **Integração de Mensageria Passiva**: O bot agora pode ecoar avisos de outros scripts diretamente para o mestre.
+- **Dependência `webrick`**: Adicionada ao Gemfile para suportar o novo listener.
+
 ## [2.2.6] - 2026-03-12
 
 ### Adicionado

@@ -4,6 +4,7 @@ require 'telegram/bot'
 require_relative 'gemini_client'
 require_relative 'access_control'
 require_relative 'goiabook_client'
+require_relative 'api_listener'
 
 module Pessegram
   class Bot
@@ -20,6 +21,9 @@ module Pessegram
     def run
       Telegram::Bot::Client.run(@token) do |bot|
         puts "Pollux (Pessegram) está online e vigiando o caos..."
+
+        # LIGA O OUVINTE AQUI! Passando o 'bot' para ele poder falar
+        Pessegram::ApiListener.start(bot)
         
         bot.listen do |message|
           case message
