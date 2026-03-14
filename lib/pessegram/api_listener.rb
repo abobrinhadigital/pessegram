@@ -6,9 +6,7 @@ module Pessegram
   class ApiListener
     def self.start(telegram_bot)
       # Agora a usar a sua nomenclatura padronizada
-      port = (ENV['LISTENER_API_PORT'] || 7355).to_i
       token = ENV['LISTENER_API_TOKEN']
-      puts "DEBUG: O token carregado é: '#{token}'"
 
       # Servidor silencioso para não poluir o terminal do Pessegram
       server = WEBrick::HTTPServer.new(
