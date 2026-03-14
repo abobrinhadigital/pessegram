@@ -96,6 +96,7 @@ module Pessegram
       return bot.api.send_message(chat_id: message.chat.id, text: "MangofierService não configurado, mestre.") unless @mangofier
 
       @mangofier.post_link(url)
+      puts "🥭 Mangofier: Link '#{url}' encaminhado com sucesso!"
       # bot.api.send_message(chat_id: message.chat.id, text: "Link encaminhado para o mangofier_service com sucesso! 🥭")
     rescue MangofierClient::Error => e
       bot.api.send_message(chat_id: message.chat.id, text: "Falha ao enviar para o Mangofier: #{e.message}")
