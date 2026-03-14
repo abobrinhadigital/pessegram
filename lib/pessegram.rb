@@ -10,6 +10,7 @@ require_relative 'pessegram/bot'
 require_relative 'pessegram/memory'
 require_relative 'pessegram/cli'
 require_relative 'pessegram/api_listener'
+require_relative 'pessegram/mangofier_client'
 
 module Pessegram
   class Error < StandardError; end

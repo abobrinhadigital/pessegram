@@ -2,6 +2,13 @@
 
 Todas as mudanças notáveis no projeto **Pessegram** serão documentadas neste arquivo.
 
+## [3.1.0] - 2026-03-14
+
+### Adicionado
+- **Integração Mangofier Service**: Triagem inteligente de links. Respostas a mensagens do bot que contêm "MU:" agora são encaminhadas para o `mangofier_service` em vez do GoiabookLM.
+- **MangofierClient**: Novo cliente HTTP para comunicação com o serviço de mangás.
+- **Fluxo Silencioso**: Removida a confirmação de encaminhamento para o Mangofier, permitindo que o serviço de destino gerencie o feedback ao usuário.
+
 ## [3.0.0] - 2026-03-14
 
 ### Adicionado

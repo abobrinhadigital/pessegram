@@ -12,9 +12,9 @@ module Pessegram
       gemini_model = ENV['GEMINI_MODEL'] || 'gemini-2.0-flash'
       persona_path = Pessegram.persona_path
 
-      goiabook_config = {
-        url: ENV['GOIABOOK_API_URL'],
-        token: ENV['GOIABOOK_API_TOKEN']
+      mangofier_config = {
+        url: ENV['MANGOFIER_API_URL'],
+        token: ENV['MANGOFIER_API_TOKEN']
       }
 
       if [token, master_id, gemini_key].any? { |v| v.nil? || v.empty? }
@@ -22,7 +22,7 @@ module Pessegram
         exit 1
       end
 
-      Pessegram::Bot.new(token, master_id, gemini_key, persona_path, goiabook_config, gemini_model).run
+      Pessegram::Bot.new(token, master_id, gemini_key, persona_path, goiabook_config, gemini_model, mangofier_config).run
     end
 
     desc "list-models", "Lista os modelos disponíveis no Google Gemini"
