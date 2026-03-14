@@ -17,7 +17,7 @@ module Pessegram
       )
 
       # O endpoint universal de comunicação
-      server.mount_proc '/gritar' do |req, res|
+      server.mount_proc '/falar' do |req, res|
         auth_header = req.header['authorization']&.first
 
         # 1. Verifica a procedência (A porta de segurança)
