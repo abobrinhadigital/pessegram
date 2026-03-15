@@ -65,26 +65,8 @@ module Pessegram
           Thread.new do 
             begin
               @mangofier.mapear_link(mu_url)
-              bot.api.send_message(
-                chat_id: message.chat.id,
-                text: "Mapeado! Agora mande o link de leitura (MangaDex/Custom):",
-                reply_markup: Telegram::Bot::Types::ForceReply.new(force_reply: true, selective: true)
-              )
             rescue StandardError => e
-              bot.api.send_message(chat_id: message.chat.id, text: "Erro ao iniciar mapeamento: #{e.message}")
-            end
-          end
-          return
-        when "Mapeado! Agora mande o link de leitura (MangaDex/Custom):"
-          leitura_url = message.text
-          Thread.new do
-            begin
-              # Usamos o post_link padrão que já lida com o contexto se necessário,
-              # mas aqui o Mangofier já deve ter o contexto do mapear_link anterior
-              @mangofier.post_link(leitura_url)
-              bot.api.send_message(chat_id: message.chat.id, text: "🫡 Tudo salvo no banco do Mangofier!")
-            rescue StandardError => e
-              bot.api.send_message(chat_id: message.chat.id, text: "Erro ao finalizar mapeamento: #{e.message}")
+              bot.api.send_message(chat_id: message.chat.id, text: "Erro ao realizar mapeamento: #{e.message}")
             end
           end
           return
