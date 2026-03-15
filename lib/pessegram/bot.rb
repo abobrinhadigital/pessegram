@@ -71,6 +71,8 @@ module Pessegram
             bot.api.send_message(chat_id: message.chat.id, text: "Erro ao iniciar mapeamento: #{e.message}")
           end
         end
+      when /^\/mapear/
+        bot.api.send_message(chat_id: message.chat.id, text: "Mestre, para usar o mapeamento ativo, digite: `/mapear [LINK_DO_MANGAUPDATES]`")
       when %r{https?://\S+}
         url = Regexp.last_match(0)
         
