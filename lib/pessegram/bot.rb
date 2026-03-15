@@ -57,10 +57,50 @@ module Pessegram
         return
       end
 
+      # 1. INTERCEPTADORES DE RESPOSTA (Fluxo Assistido / Force Reply)
+      if message.reply_to_message && message.reply_to_message.from.is_bot
+        case message.reply_to_message.text
+        when "Mande o link do MangaUpdates, mestre:"
+          mu_url = message.text
+          Thread.new do 
+            begin
+              @mangofier.mapear_link(mu_url)
+              bot.api.send_message(
+                chat_id: message.chat.id,
+                text: "Mapeado! Agora mande o link de leitura (MangaDex/Custom):",
+                reply_markup: Telegram::Bot::Types::ForceReply.new(force_reply: true)
+              )
+            rescue StandardError => e
+              bot.api.send_message(chat_id: message.chat.id, text: "Erro ao iniciar mapeamento: #{e.message}")
+            end
+          end
+          return
+        when "Mapeado! Agora mande o link de leitura (MangaDex/Custom):"
+          leitura_url = message.text
+          Thread.new do
+            begin
+              # Usamos o post_link padrão que já lida com o contexto se necessário,
+              # mas aqui o Mangofier já deve ter o contexto do mapear_link anterior
+              @mangofier.post_link(leitura_url)
+              bot.api.send_message(chat_id: message.chat.id, text: "🫡 Tudo salvo no banco do Mangofier!")
+            rescue StandardError => e
+              bot.api.send_message(chat_id: message.chat.id, text: "Erro ao finalizar mapeamento: #{e.message}")
+            end
+          end
+          return
+        end
+      end
+
       case message.text
       when '/start'
         @memory.clear
         bot.api.send_message(chat_id: message.chat.id, text: "Saudações, meu mestre. O Pessegram está ativo. Memória limpa. O que falhou hoje?")
+      when '/mapear'
+        bot.api.send_message(
+          chat_id: message.chat.id,
+          text: "Mande o link do MangaUpdates, mestre:",
+          reply_markup: Telegram::Bot::Types::ForceReply.new(force_reply: true)
+        )
       when /^\/mapear\s+(https?:\/\/\S+)/
         url_mu = Regexp.last_match(1)
         Thread.new do
