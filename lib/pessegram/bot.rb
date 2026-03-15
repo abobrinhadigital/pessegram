@@ -61,6 +61,16 @@ module Pessegram
       when '/start'
         @memory.clear
         bot.api.send_message(chat_id: message.chat.id, text: "Saudações, meu mestre. O Pessegram está ativo. Memória limpa. O que falhou hoje?")
+      when /^\/mapear\s+(https?:\/\/\S+)/
+        url_mu = Regexp.last_match(1)
+        Thread.new do
+          begin
+            @mangofier.mapear_link(url_mu)
+            puts "🥭 Mangofier: Pedido de mapeamento ativo enviado!"
+          rescue => e
+            bot.api.send_message(chat_id: message.chat.id, text: "Erro ao iniciar mapeamento: #{e.message}")
+          end
+        end
       when %r{https?://\S+}
         url = Regexp.last_match(0)
         

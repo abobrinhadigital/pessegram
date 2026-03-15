@@ -38,5 +38,30 @@ module Pessegram
     rescue StandardError => e
       raise Error, "Falha na comunicação com Mangofier: #{e.message.to_s.force_encoding('UTF-8')}"
     end
+
+    def mapear_link(url_mu)
+      uri_mapear = @url.dup
+      uri_mapear.path = '/mapearlink'
+
+      request = Net::HTTP::Post.new(uri_mapear.path, {
+        'Content-Type' => 'application/json',
+        'Authorization' => "Bearer #{@token}"
+      })
+      
+      request.body = { mensagem: url_mu }.to_json
+
+      response = Net::HTTP.start(uri_mapear.host, uri_mapear.port, use_ssl: uri_mapear.scheme == 'https') do |http|
+        http.open_timeout = 5
+        http.read_timeout = 5
+        http.request(request)
+      end
+
+      unless response.is_a?(Net::HTTPSuccess)
+        error_body = response.body.to_s.force_encoding('UTF-8')
+        raise Error, "Erro no Mangofier (Mapear): #{response.code} - #{error_body}"
+      end
+    rescue StandardError => e
+      raise Error, "Falha ao enviar comando de mapeamento: #{e.message.to_s.force_encoding('UTF-8')}"
+    end
   end
 end
