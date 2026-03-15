@@ -64,8 +64,11 @@ module Pessegram
       when %r{https?://\S+}
         url = Regexp.last_match(0)
         
-        # Se for um link em uma RESPOSTA a uma mensagem do bot que contém "MU:", manda pro Mangofier
-        if message.reply_to_message && message.reply_to_message.from.is_bot && message.reply_to_message.text&.include?("MU:")
+        # Se for um link em uma RESPOSTA a uma mensagem do bot que contém o link do MangaUpdates (MU)
+        original_text = message.reply_to_message&.text.to_s
+        is_mangofier_hint = message.reply_to_message&.from&.is_bot && original_text.match?(/mangaupdates\.com\/series\/[a-z0-9]+/i)
+
+        if is_mangofier_hint
           # Usa Thread para não travar o bot se o Mangofier estiver lento/morto
           Thread.new { forward_to_mangofier(bot, message, url) }
         else
