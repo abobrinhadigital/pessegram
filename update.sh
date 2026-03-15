@@ -14,7 +14,7 @@ bundle install
 
 echo "--- [3/3] Restarting Pessegram service ---"
 # O sistema pode pedir sua senha aqui, mestre. Tente não errar.
-if sudo systemctl restart pessegram; then
+if systemctl restart pessegram; then
     echo "--- Update complete! O bot voltou a vigiar o seu azar. ---"
 else
     echo "--- ERRO: O serviço se recusou a subir. Verifique o journalctl. ---"
