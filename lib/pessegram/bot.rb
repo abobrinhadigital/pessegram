@@ -68,7 +68,7 @@ module Pessegram
               bot.api.send_message(
                 chat_id: message.chat.id,
                 text: "Mapeado! Agora mande o link de leitura (MangaDex/Custom):",
-                reply_markup: Telegram::Bot::Types::ForceReply.new(force_reply: true)
+                reply_markup: Telegram::Bot::Types::ForceReply.new(force_reply: true, selective: true)
               )
             rescue StandardError => e
               bot.api.send_message(chat_id: message.chat.id, text: "Erro ao iniciar mapeamento: #{e.message}")
@@ -99,7 +99,7 @@ module Pessegram
         bot.api.send_message(
           chat_id: message.chat.id,
           text: "Mande o link do MangaUpdates, mestre:",
-          reply_markup: Telegram::Bot::Types::ForceReply.new(force_reply: true)
+          reply_markup: Telegram::Bot::Types::ForceReply.new(force_reply: true, selective: true)
         )
       when /^\/mapear\s+(https?:\/\/\S+)/
         url_mu = Regexp.last_match(1)
