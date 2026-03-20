@@ -1,6 +1,5 @@
 # lib/api_listener.rb
 require 'webrick'
-require 'socket'
 require 'json'
 
 module Pessegram
@@ -8,25 +7,17 @@ module Pessegram
     @server = nil
 
     def self.start(telegram_bot)
-      # Desliga server anterior se existir (evita "Address already in use")
       stop
 
       port = (ENV['LISTENER_API_PORT'] || 7355).to_i
       token = ENV['LISTENER_API_TOKEN']
 
-      # Cria socket TCP com SO_REUSEADDR para permitir rebind imediato
-      tcp_server = TCPServer.new('0.0.0.0', port)
-      tcp_server.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true)
-
       @server = WEBrick::HTTPServer.new(
-        Port: tcp_server.addr[1],
+        Port: port,
         AccessLog: [],
-        Logger: WEBrick::Log.new(File::NULL),
-        DoNotListen: true
+        Logger: WEBrick::Log.new(File::NULL)
       )
-      @server.listeners << tcp_server
 
-      # O endpoint universal de comunicação
       @server.mount_proc '/falar' do |req, res|
         auth_header = req.header['authorization']&.first
 
@@ -43,7 +34,6 @@ module Pessegram
                 chat_id: ENV['MASTER_USER_ID'],
                 text: mensagem
               )
-
               res.status = 200
               res.body = { status: 'ok', info: 'Grito ecoado no Telegram com sucesso!' }.to_json
             end
@@ -57,11 +47,8 @@ module Pessegram
         end
       end
 
-      puts "🎧 API Listener a escutar nas sombras pela porta #{port}..."
-
-      Thread.new do
-        @server.start
-      end
+      puts "🎧 API Listener na porta #{port}..."
+      Thread.new { @server.start }
     end
 
     def self.stop
