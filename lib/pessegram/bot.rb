@@ -27,7 +27,7 @@ module Pessegram
                    end
     end
 
-    def run
+    def run(retry_count = 0)
       Telegram::Bot::Client.run(@token) do |bot|
         puts 'Pollux (Pessegram) está online e vigiando o caos...'
 
@@ -54,8 +54,13 @@ module Pessegram
       puts "Ocorreu um erro catastrófico no bot: #{e.message}"
       puts "Backtrace: #{e.backtrace.first(5).join("\n")}"
       Pessegram::ApiListener.stop
-      sleep 5
-      retry
+
+      # Backoff exponencial: 10s, 20s, 40s, 80s... máximo 5 minutos
+      wait_time = [10 * (2**retry_count), 300].min
+      puts "Aguardando #{wait_time}s antes de reiniciar... (tentativa #{retry_count + 1})"
+      sleep wait_time
+
+      run(retry_count + 1)
     end
 
     private
