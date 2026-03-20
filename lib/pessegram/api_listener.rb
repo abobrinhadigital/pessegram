@@ -54,9 +54,11 @@ module Pessegram
         end
       end
 
+      actual_port = @server.port
+      puts "🎧 API Listener a escutar nas sombras pela porta #{actual_port}..."
+
       Thread.new do
         @server.start
-        puts "🎧 API Listener a escutar nas sombras pela porta #{@server.port}..."
       end
     end
 
