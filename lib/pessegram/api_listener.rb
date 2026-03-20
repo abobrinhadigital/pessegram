@@ -1,5 +1,6 @@
 # lib/api_listener.rb
 require 'webrick'
+require 'socket'
 require 'json'
 
 module Pessegram
@@ -13,15 +14,17 @@ module Pessegram
       port = (ENV['LISTENER_API_PORT'] || 7355).to_i
       token = ENV['LISTENER_API_TOKEN']
 
-      # Porta 0 = OS escolhe uma disponível (evita conflito em desenvolvimento)
-      # Para porta fixa, remova a condição abaixo
-      actual_port = port == 0 ? 0 : port
+      # Cria socket TCP com SO_REUSEADDR para permitir rebind imediato
+      tcp_server = TCPServer.new('0.0.0.0', port)
+      tcp_server.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true)
 
       @server = WEBrick::HTTPServer.new(
-        Port: actual_port,
+        Port: tcp_server.addr[1],
         AccessLog: [],
-        Logger: WEBrick::Log.new(File::NULL)
+        Logger: WEBrick::Log.new(File::NULL),
+        DoNotListen: true
       )
+      @server.listeners << tcp_server
 
       # O endpoint universal de comunicação
       @server.mount_proc '/falar' do |req, res|
@@ -54,8 +57,7 @@ module Pessegram
         end
       end
 
-      actual_port = @server.port
-      puts "🎧 API Listener a escutar nas sombras pela porta #{actual_port}..."
+      puts "🎧 API Listener a escutar nas sombras pela porta #{port}..."
 
       Thread.new do
         @server.start
