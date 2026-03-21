@@ -5,8 +5,6 @@
 
 set -e
 
-cd /root/pessegram
-
 echo "--- [1/3] Pulling latest changes from git ---"
 git pull
 

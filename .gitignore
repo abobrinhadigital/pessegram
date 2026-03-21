@@ -17,3 +17,8 @@ data/*
 !data/.gitkeep
 assets/*
 !assets/.gitkeep
+
+# Instruções da IA e configurações de agente
+AGENTS.md
+.cursorrules
+.copilot-instructions.md
