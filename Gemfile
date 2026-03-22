@@ -7,4 +7,5 @@ gem 'net-http'
 gem 'uri'
 gem 'json'
 gem 'open-uri'
-gem 'webrick'
+gem 'puma'  # API Router
+gem 'rack'  # Rack para webserver

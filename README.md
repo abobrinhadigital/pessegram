@@ -1,48 +1,131 @@
-# Pessegram
+# Pessegram v4.0.0 - Arquitetura Multi-Bot
 
-O **Pessegram** é o sucessor espiritual e técnico do Damascord, um bot modular para Telegram focado em registrar o caos, gerenciar links e habitar a "preguiça produtiva" do Mestre. Construído em Ruby puro, ele é o biógrafo oficial do azar de Murphy.
+O **Pessegram** é o sucessor espiritual e técnico do Damascord, um sistema multi-bot para Telegram focado em registrar o caos, gerenciar links e habitar a "preguiça produtiva" do Mestre. Construído em Ruby, ele é o biógrafo oficial do azar de Murphy.
 
-## Funcionalidades v1.0
+## 🚀 Novidades na v4.0.0
 
-### 1. Diálogos Ácidos (Gemini AI)
-- **Integração Nativa**: Comunicação direta com a API do Gemini via `Net::HTTP`, sem gems de IA pesadas.
-- **Identidade Dinâmica**: Persona configurável via `data/ai_persona.md` com suporte a interpolação dinâmica de variáveis.
-- **Sarcasmo de Precisão**: Respostas curtas, diretas e devidamente amargas.
+### Arquitetura Multi-Bot
+- **API Router (Puma)**: Roteador central que distribui requisições para 3 bots especializados
+- **Chatbot**: Bot principal para diálogos com Gemini AI
+- **GoiabookLM**: Bot especializado em processamento e sumarização de URLs
+- **Mangofier**: Bot especializado em mapeamento de mangás
 
-### 2. Controle de Acesso de Elite
-- **Master ID Lockdown**: O bot só obedece ao Mestre Marcelo (ID configurado no `.env`).
-- **Middleware de Segurança**: Qualquer outro usuário que tente interagir receberá um erro sarcástico e será ignorado.
+### Cloudflare Tunnel
+- Integração nativa com túneis Cloudflare para exposição segura
+- Suporte a múltiplos subdomínios (`pessegram.mogami.dev.br`, etc.)
+- Configuração automática de webhooks
 
-### 3. Integração GoiabookLM
-- **Salvamento Automático**: Qualquer link enviado pelo mestre é instantaneamente cadastrado no GoiabookLM.
-- **Protocolo de Rede**: Uso de `Net::HTTP` para garantir paridade técnica com o ecossistema Abobrinha Digital.
+### Processamento em Background
+- **Solid Queue**: Sistema de filas para processamento assíncrono
+- **Bancos de Dados Separados**: SQLite para cada serviço (cache, queue, cable)
+- **Notificação Automática**: Resumos são enviados ao Telegram automaticamente
 
-### 4. Interface CLI Profissional
-- **Thor Powered**: Execução simplificada via `bin/pessegram`.
-- **Dinamismo**: Carregamento automático de ambiente e dependências.
+## 🤖 Bots Disponíveis
 
-## Configuração e Instalação
+### 1. Chatbot (`/bot/chatbot`)
+- **Modelo**: Gemini AI (gemini-2.5-flash)
+- **Função**: Diálogos ácidos e respostas contextuais
+- **Comandos**: `/start`, conversas normais
+- **Persona**: Configurável via `data/ai_persona.md`
+
+### 2. GoiabookLM (`/bot/goiabooklm`)
+- **Função**: Processamento de URLs e geração de resumos
+- **Integração**: API GoiabookLM para sumarização
+- **Fluxo**: URL → Processamento → Resumo → Notificação
+
+### 3. Mangofier (`/bot/mangofier`)
+- **Função**: Mapeamento de URLs do MangaUpdates
+- **Integração**: API Mangofier para busca de correspondências
+- **Comando**: `/mapear <url>` ou resposta a mensagens com "MU:"
+
+## 📁 Estrutura do Projeto
+
+```
+pessegram/
+├── bin/
+│   └── pessegram          # Executável principal
+├── bots/
+│   ├── chatbot/           # Implementação do chatbot
+│   ├── goiabooklm/        # Implementação do bot de URLs
+│   └── mangofier/         # Implementação do bot de mangás
+├── config/
+│   ├── tunnel.yml.example # Configuração do Cloudflare Tunnel
+│   └── ...
+├── lib/
+│   └── pessegram/
+│       ├── api_router.rb  # Roteador API (Puma)
+│       ├── bots.rb        # Registro dos bots
+│       ├── ...
+├── data/                  # Persona e dados locais
+├── CHANGELOG.md           # Histórico de mudanças
+└── README.md              # Este arquivo
+```
+
+## ⚙️ Configuração
 
 ### Requisitos
 - Ruby 3.4.8+
 - Bundler
+- Cloudflare Tunnel (para exposição pública)
 
-### Configuração Inicial
-1. Clone o repositório.
-2. Copie o arquivo `.env.example` para `.env` e preencha as chaves:
-   - `TELEGRAM_BOT_TOKEN`: Obtido via @BotFather.
-   - `GEMINI_API_KEY`: Chave da API do Google Gemini.
-   - `MASTER_USER_ID`: Seu ID do Telegram (use @userinfobot para descobrir).
-   - `GOIABOOK_URL` e `GOIABOOK_TOKEN`: Credenciais da Goiaba.
+### Variáveis de Ambiente (.env)
+```bash
+# Bot Tokens
+TELEGRAM_BOT_TOKEN=           # Token do bot principal (Chatbot)
+GOIABOOK_BOT_TOKEN=           # Token do GoiabookLM
+MANGOFIER_BOT_TOKEN=          # Token do Mangofier
 
-### Execução
-- `bundle install` para instalar as dependências (incluindo fix de Ruby 3.4+).
-- `./bin/pessegram start` para iniciar o serviço.
+# APIs
+GEMINI_API_KEY=               # Chave da API Google Gemini
+GOIABOOK_API_TOKEN=           # Token para API GoiabookLM
+SCRAPE_DO_API_TOKEN=          # Token para Scrape.do (opcional)
 
-## Estrutura do Projeto
-- `bin/`: CLI e executáveis (Thor).
-- `lib/`: Implementação modular (Gemini, AccessControl, Goiabook).
-- `data/`: Persona e dados ignorados pelo git.
+# Configurações
+MASTER_USER_ID=               # ID do usuário mestre
+PESSEGRAM_API_TOKEN=          # Token para autenticação interna
+PESSEGRAM_CHAT_ID=            # ID do chat para notificações
+```
+
+## 🚀 Instalação e Execução
+
+### Local
+```bash
+bundle install
+./bin/pessegram start
+```
+
+### Produção (Systemd)
+```bash
+# Instalar como serviço
+./script/install_service.sh
+
+# Atualizar
+./update.sh
+```
+
+### Cloudflare Tunnel
+```bash
+# Configuração automática (já incluída)
+# Os tunnels são configurados via variáveis de ambiente
+```
+
+## 🔧 Configuração dos Webhooks
+
+Os webhooks são configurados automaticamente quando os bots são iniciados com a URL do túnel configurada.
+
+## 📊 Monitoramento
+
+- **Logs**: Saída detalhada para debug
+- **Status dos Bots**: Cada bot reporta seu status
+- **Webhook Info**: Informações dos webhooks no Telegram
+
+## 🛡️ Segurança
+
+- Controle de acesso por `MASTER_USER_ID`
+- Autenticação de API com tokens
+- Validação de webhooks
+- Logs de auditoria
 
 ---
+
 Desenvolvido no caos para o ecossistema [Abobrinha Digital](https://abobrinhadigital.github.io/).

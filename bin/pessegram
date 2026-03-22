@@ -4,19 +4,94 @@
 require 'bundler/setup'
 require_relative '../lib/pessegram'
 
-# Capturando os sinais de morte do teclado (INT/Ctrl+C) e do systemd (TERM)
-%w[INT TERM].each do |signal|
-  Signal.trap(signal) do
-    puts "\nRecebi o sinal #{signal}. Desligando Pollux graciosamente... O caos continuará sem mim."
-    Pessegram::ApiListener.stop
-    sleep 1 # Tempo para a porta ser liberada
-    exit 0
+module Pessegram
+  class Application
+    def initialize
+      @config = ConfigLoader.load
+      @api_router = ApiRouter.new(
+        port: @config[:api_router_port],
+        token: @config[:api_router_token]
+      )
+      @webhook_router = WebhookRouter.new
+    end
+
+    def run
+      puts "🤖 Pessegram 4.0.0 - Multi-Bot Architecture"
+      puts "=" * 50
+
+      setup_bots
+      start_api_router
+
+      puts "=" * 50
+      puts "✅ Todos os bots estão rodando!"
+      puts "📍 Webhooks: /chatbot, /goiabooklm, /mangofier"
+      puts "📍 API Router: porta #{@config[:api_router_port]}"
+      puts ""
+      puts "Pressione Ctrl+C para encerrar."
+
+      # Manter vivo
+      trap('INT') { shutdown }
+      trap('TERM') { shutdown }
+
+      sleep
+    end
+
+    private
+
+    def setup_bots
+      require 'telegram/bot'
+
+      # Chatbot
+      @chatbot = Chatbot::Bot.new(
+        token: @config[:chatbot_token],
+        master_id: @config[:master_id],
+        gemini_api_key: @config[:gemini_api_key],
+        gemini_model: @config[:gemini_model],
+        persona_path: File.expand_path('../data/personas/chatbot.md', __dir__)
+      )
+      @chatbot.set_api(Telegram::Bot::Api.new(@config[:chatbot_token]))
+      @chatbot.register_on(@webhook_router)
+      @api_router.register_bot('chatbot', @chatbot)
+      puts "✅ Chatbot registrado em /chatbot"
+
+      # GoiabookLM
+      @goiabooklm = GoiabookLM::Bot.new(
+        token: @config[:goiabooklm_token],
+        master_id: @config[:master_id],
+        api_url: @config[:goiabook_api_url],
+        api_token: @config[:goiabook_api_token],
+        api_router: @api_router
+      )
+      @goiabooklm.set_api(Telegram::Bot::Api.new(@config[:goiabooklm_token]))
+      @goiabooklm.register_on(@webhook_router)
+      @api_router.register_bot('goiabooklm', @goiabooklm)
+      puts "✅ GoiabookLM registrado em /goiabooklm"
+
+      # Mangofier
+      @mangofier = Mangofier::Bot.new(
+        token: @config[:mangofier_token],
+        master_id: @config[:master_id],
+        mangofier_url: @config[:mangofier_api_url],
+        mangofier_token: @config[:mangofier_api_token]
+      )
+      @mangofier.set_api(Telegram::Bot::Api.new(@config[:mangofier_token]))
+      @mangofier.register_on(@webhook_router)
+      @api_router.register_bot('mangofier', @mangofier)
+      puts "✅ Mangofier registrado em /mangofier"
+    end
+
+    def start_api_router
+      @api_router.start
+      puts "🎧 API Router iniciado na porta #{@config[:api_router_port]}"
+    end
+
+    def shutdown
+      puts "\n🛑 Encerrando Pessegram..."
+      @api_router&.stop
+      exit 0
+    end
   end
 end
 
-begin
-  Pessegram::CLI.start(ARGV)
-rescue StandardError => e
-  puts "\n[ERRO CATASTRÓFICO]: #{e.message}"
-  exit 1
-end
+# Executar
+Pessegram::Application.new.run

@@ -1,21 +1,22 @@
 # frozen_string_literal: true
 
 require 'dotenv/load'
-require 'telegram/bot'
-require_relative 'pessegram/version'
-require_relative 'pessegram/gemini_client'
-require_relative 'pessegram/access_control'
-require_relative 'pessegram/goiabook_client'
-require_relative 'pessegram/bot'
-require_relative 'pessegram/memory'
-require_relative 'pessegram/cli'
-require_relative 'pessegram/api_listener'
-require_relative 'pessegram/mangofier_client'
 
 module Pessegram
   class Error < StandardError; end
-  
+
   def self.persona_path
-    File.expand_path('../data/ai_persona.md', __dir__)
+    File.expand_path('../../data/personas', __dir__)
   end
 end
+
+# Shared components
+require_relative 'shared/base_bot'
+require_relative 'shared/config_loader'
+require_relative 'shared/api_router'
+require_relative 'shared/webhook_router'
+
+# Bots
+require_relative '../bots/chatbot/bot'
+require_relative '../bots/goiabooklm/bot'
+require_relative '../bots/mangofier/bot'

@@ -1,0 +1,10 @@
+# Configuração do Cloudflare Tunnel
+# Usar quando o domínio estiver propagado
+
+tunnel: ${CLOUDFLARE_TUNNEL_ID}
+credentials-file: /home/celo/.cloudflared/${CLOUDFLARE_TUNNEL_ID}.json
+
+ingress:
+  - hostname: ${CLOUDFLARE_DOMAIN}
+    service: http://localhost:${LISTENER_API_PORT}
+  - service: http_status:404

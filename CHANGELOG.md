@@ -2,6 +2,29 @@
 
 Todas as mudanças notáveis no projeto **Pessegram** serão documentadas neste arquivo.
 
+## [4.0.0] - 2026-03-22
+
+### Adicionado
+- **Arquitetura Multi-Bot**: Pessegram agora opera como um roteador central (API Router) com 3 bots especializados: Chatbot, GoiabookLM e Mangofier.
+- **API Router (Puma)**: Servidor web que roteia requisições para os bots correspondentes via endpoints `/bot/chatbot`, `/bot/goiabooklm`, `/bot/mangofier`.
+- **Cloudflare Tunnel**: Integração completa com túneis Cloudflare para exposição segura dos serviços via webhooks.
+- **Webhooks do Telegram**: Configuração automática de webhooks para cada bot, permitindo processamento concorrente.
+- **Sistema de Notificação**: PessegramService notifica o Telegram com resumos processados pelos bots.
+- **Tratamento de Erros Aprimorado**: Logs detalhados e respostas amigáveis para falhas de processamento.
+- **Configuração de Ambiente**: Variáveis de ambiente específicas para cada bot (tokens, URLs, IDs).
+- **Documentação de Deploy**: Scripts de instalação como serviço systemd (`install_service.sh`).
+- **Persistência de Dados**: Uso de bancos SQLite separados para cada bot e fila de jobs.
+
+### Modificado
+- **Estrutura do Projeto**: Reorganização em diretórios `bots/` com implementações especializadas.
+- **Fluxo de Processamento**: URLs são enviadas diretamente para os bots respectivos, eliminando dependência do bot principal.
+- **Configuração de Banco**: Multi-database com bancos separados para cada serviço (cache, queue, cable).
+- **Logs e Debug**: Saída de logs melhorada para monitoramento em produção.
+
+### Removido
+- **Bot Monolítico**: Substituído por arquitetura modular multi-bot.
+- **Dependência do GoiabookLM via Bot Principal**: Comunicação direta via API.
+
 ## [3.1.0] - 2026-03-14
 
 ### Adicionado
